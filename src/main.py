@@ -7,12 +7,13 @@ import shutil
 import glob
 
 
-def ffmpeg_extract_frames(file_path, destination):
+def ffmpeg_extract_frames(file_path: str, output_dir: str):
+    """Extracts frames using ffmpeg to a directory from a specified video file"""
     start_time = time.time()
 
     (
         ffmpeg.input(file_path)
-        .output(f"{destination}/frame_%07d.png")
+        .output(f"{output_dir}/frame_%07d.png")
         .overwrite_output()
         .run()
     )
@@ -21,7 +22,11 @@ def ffmpeg_extract_frames(file_path, destination):
     elapsed_time = round(end_time - start_time, 2)
 
 
-def extract_frames(file_path, cache_location):
+def extract_frames(file_path: str, cache_location: str) -> str:
+    """
+    Checks if cache directory is empty and then proceeds with extraction.
+    The user is given an option to simply re-use the cache directory if not empty.
+    """
     file_name = os.path.basename(file_path).split('.')[0]
 
     # Define a cache directory
@@ -55,9 +60,9 @@ def extract_frames(file_path, cache_location):
     return cache_dir
 
 
-def fetch_frames(frames_dir, file_extension="png"):
+def fetch_frames_paths(frames_dir: str, file_extension="png") -> list[str]:
+    """Finds all frames in the directory"""
     return glob.glob(f"{frames_dir}/*.{file_extension}")
-
 
 
 def main():
@@ -68,7 +73,8 @@ def main():
     # Ask for an input file
     file_path = filedialog.askopenfilename()
     frames_dir = extract_frames(file_path, cache_location)
-    frame_paths = fetch_frames(frames_dir)
+    frame_paths = fetch_frames_paths(frames_dir)
+
 
 if __name__ == '__main__':
     main()
