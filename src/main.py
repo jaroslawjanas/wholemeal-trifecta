@@ -4,6 +4,7 @@ import ffmpeg
 import time
 import os
 import shutil
+import glob
 
 
 def ffmpeg_extract_frames(file_path, destination):
@@ -54,6 +55,11 @@ def extract_frames(file_path, cache_location):
     return cache_dir
 
 
+def fetch_frames(frames_dir, file_extension="png"):
+    return glob.glob(f"{frames_dir}/*.{file_extension}")
+
+
+
 def main():
     cwd = os.getcwd()
     cache = ".cache"
@@ -62,7 +68,7 @@ def main():
     # Ask for an input file
     file_path = filedialog.askopenfilename()
     frames_dir = extract_frames(file_path, cache_location)
-
+    frame_paths = fetch_frames(frames_dir)
 
 if __name__ == '__main__':
     main()
