@@ -12,7 +12,7 @@ def ffmpeg_extract_frames(file_path, destination):
 
     (
         ffmpeg.input(file_path)
-        .output(f"{destination}/frame_%04d.png")
+        .output(f"{destination}/frame_%07d.png")
         .overwrite_output()
         .run()
     )
