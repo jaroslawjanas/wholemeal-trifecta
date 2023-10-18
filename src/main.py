@@ -5,6 +5,9 @@ import time
 import os
 import shutil
 import glob
+import numpy as np
+import numpy.typing as npt
+from PIL import Image
 
 
 def ffmpeg_extract_frames(file_path: str, output_dir: str):
@@ -65,6 +68,11 @@ def fetch_frames_paths(frames_dir: str, file_extension="png") -> list[str]:
     return glob.glob(f"{frames_dir}/*.{file_extension}")
 
 
+def open_img(image_path: str) -> npt.NDArray[np.uint8]:
+    image = Image.open(image_path)
+    return np.asarray(image, dtype="uint8")
+
+
 def main():
     cwd = os.getcwd()
     cache = ".cache"
@@ -73,7 +81,8 @@ def main():
     # Ask for an input file
     file_path = filedialog.askopenfilename()
     frames_dir = extract_frames(file_path, cache_location)
-    frame_paths = fetch_frames_paths(frames_dir)
+    frames_paths = fetch_frames_paths(frames_dir)
+    open_img(frames_paths[0])
 
 
 if __name__ == '__main__':
