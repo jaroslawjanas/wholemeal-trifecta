@@ -4,4 +4,6 @@ channels:
 dependencies:
   - python=3.11
   - tk=8.6.12
+  - pillow=10.0.1
+  - numpy=1.26.0
   - conda-forge::ffmpeg-python=0.2.0
