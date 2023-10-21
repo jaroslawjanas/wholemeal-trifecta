@@ -4,9 +4,8 @@ import ffmpeg
 import time
 import os
 import shutil
-import glob
 from mscore import parallel_movement_scores
-from typing import List
+from utils import fetch_file_paths
 
 
 def ffmpeg_extract_frames(file_path: str, output_dir: str):
@@ -62,11 +61,6 @@ def extract_frames(file_path: str, cache_location: str) -> str:
     return cache_dir
 
 
-def fetch_frame_paths(frames_dir: str, file_extension="png") -> List[str]:
-    """Find all frame files in a directory and return their paths."""
-    return glob.glob(f"{frames_dir}/*.{file_extension}")
-
-
 def main():
     cwd = os.getcwd()
     cache = ".cache"
@@ -75,7 +69,7 @@ def main():
     # Ask for an input file
     file_path = filedialog.askopenfilename()
     frames_dir = extract_frames(file_path, cache_location)
-    frame_paths = fetch_frame_paths(frames_dir)
+    frame_paths = fetch_file_paths(frames_dir)
     parallel_movement_scores(frame_paths, workers=12, chunks=12)
 
 
