@@ -13,7 +13,7 @@ def calc_movement_heatmap(
         mode: Literal["linear", "exponential"] = "exponential") -> NDArray[uint8]:
     """Calculate a movement heatmap by subtracting two images and averaging the color channels."""
 
-    if mode is "exponential":
+    if mode == "exponential":
         movement_heatmap_rgb = np.square(img1 - img2)
     else:
         movement_heatmap_rgb = np.abs(img1 - img2)
