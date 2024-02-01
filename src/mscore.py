@@ -7,27 +7,27 @@ from numpy import uint8
 from numpy.typing import NDArray
 
 
-def movement_heatmap(img1: NDArray[int], img2: NDArray[int]) -> NDArray[uint8]:
+def calc_movement_heatmap(img1: NDArray[int], img2: NDArray[int]) -> NDArray[uint8]:
     """Calculate a movement heatmap by subtracting two images and averaging the color channels."""
     movement_heatmap_rgb = np.abs(img1 - img2)
     # Average channels (convert to grayscale)
     return np.mean(movement_heatmap_rgb, axis=-1, dtype="uint8")
 
 
-def movement_score(img1: NDArray[int], img2: NDArray[int]) -> float:
+def calc_movement_score(img1: NDArray[int], img2: NDArray[int]) -> float:
     """Calculate the movement score between two images based on their movement heatmaps."""
-    mov_heatmap = movement_heatmap(img1, img2)
+    mov_heatmap = calc_movement_heatmap(img1, img2)
     return np.mean(mov_heatmap)
 
 
-def movement_scores(frame_paths: List[str]) -> List[Tuple[str, float]]:
+def calc_movement_scores(frame_paths: List[str]) -> List[Tuple[str, float]]:
     """Calculate movement scores for a list of frame paths and return them as a list of (path, score) tuples."""
     mov_scores = [(frame_paths[0], 0.0)]
     previous_frame_img = open_img(frame_paths[0])
 
     for frame_path in frame_paths[1:]:
         frame_img = open_img(frame_path)
-        mov_score = movement_score(previous_frame_img, frame_img)
+        mov_score = calc_movement_score(previous_frame_img, frame_img)
         mov_scores.append((frame_path, mov_score))
         previous_frame_img = frame_img
 
@@ -58,14 +58,14 @@ def split_paths_to_chunks(frame_paths: List[str], no_chunks: int) -> List[List[s
     return paths
 
 
-def parallel_movement_scores(frame_paths: [List[str]], workers=12, chunks=12) -> List[Tuple[str, float]]:
+def calc_parallel_movement_scores(frame_paths: [List[str]], workers=12, chunks=12) -> List[Tuple[str, float]]:
     """Calculate movement scores for a list of frame paths in parallel using multiple workers."""
     pool = Pool(processes=workers)
     start_time = time.time()
     print(f"Calculating movement scores of frames ({workers} workers)...")
 
     frame_paths_chunks = split_paths_to_chunks(frame_paths, chunks)
-    mov_score_chunks = pool.map(movement_scores, frame_paths_chunks)
+    mov_score_chunks = pool.map(calc_movement_scores, frame_paths_chunks)
 
     merged = []
     for mov_score_chunk in mov_score_chunks:

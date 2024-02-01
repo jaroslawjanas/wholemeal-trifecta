@@ -4,7 +4,7 @@ import ffmpeg
 import time
 import os
 import shutil
-from mscore import parallel_movement_scores
+from mscore import calc_parallel_movement_scores
 from utils import fetch_file_paths
 
 
@@ -70,7 +70,7 @@ def main():
     file_path = filedialog.askopenfilename()
     frames_dir = extract_frames(file_path, cache_location)
     frame_paths = fetch_file_paths(frames_dir)
-    parallel_movement_scores(frame_paths, workers=12, chunks=12)
+    calc_parallel_movement_scores(frame_paths, workers=12, chunks=12)
 
 
 if __name__ == '__main__':
