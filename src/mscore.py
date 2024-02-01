@@ -2,14 +2,22 @@ import numpy as np
 from multiprocessing import Pool
 import time
 from utils import open_img
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 from numpy import uint8
 from numpy.typing import NDArray
 
 
-def calc_movement_heatmap(img1: NDArray[int], img2: NDArray[int]) -> NDArray[uint8]:
+def calc_movement_heatmap(
+        img1: NDArray[int],
+        img2: NDArray[int],
+        mode: Literal["linear", "exponential"] = "exponential") -> NDArray[uint8]:
     """Calculate a movement heatmap by subtracting two images and averaging the color channels."""
-    movement_heatmap_rgb = np.abs(img1 - img2)
+
+    if mode is "exponential":
+        movement_heatmap_rgb = np.square(img1 - img2)
+    else:
+        movement_heatmap_rgb = np.abs(img1 - img2)
+
     # Average channels (convert to grayscale)
     return np.mean(movement_heatmap_rgb, axis=-1, dtype="uint8")
 
