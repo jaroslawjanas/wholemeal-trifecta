@@ -5,6 +5,7 @@ from utils import open_img
 from typing import List, Tuple, Literal
 from numpy import uint8
 from numpy.typing import NDArray
+from cache import Cache
 
 
 def calc_movement_heatmap(
@@ -90,3 +91,23 @@ def calc_parallel_movement_scores(frame_paths: [List[str]], workers=12, chunks=1
         raise ValueError("The number of movement score values does not match the number of frames.")
 
     return merged
+
+
+def retrieve_movement_scores(frame_paths: [List[str]], file_cache: Cache) -> List[Tuple[str, float]]:
+    movement_scores = file_cache.load_object("movement_scores")
+
+    if movement_scores is not None:
+        uin = input(f"The cache for movement scores is not empty." +
+                    "\nWould you like to reuse it [y/n]?" +
+                    "\n>>> ")
+
+        if uin == "y":
+            return frame_paths
+        else:
+            file_cache.delete_object("movement_scores")
+
+    movement_scores = calc_parallel_movement_scores(frame_paths)
+    file_cache.store_object(movement_scores, "movement_scores")
+
+    return movement_scores
+

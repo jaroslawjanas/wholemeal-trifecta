@@ -3,9 +3,9 @@ from tkinter import filedialog
 import ffmpeg
 import time
 import os
-import shutil
-from mscore import calc_parallel_movement_scores
-from utils import fetch_file_paths
+from mscore import retrieve_movement_scores
+from typing import List
+from cache import Cache
 
 
 def ffmpeg_extract_frames(file_path: str, output_dir: str):
@@ -25,52 +25,49 @@ def ffmpeg_extract_frames(file_path: str, output_dir: str):
     print(f"Done! Took {elapsed_time} seconds.")
 
 
-def extract_frames(file_path: str, cache_location: str) -> str:
+def extract_frames(file_path: str, file_cache: Cache) -> List[str]:
     """Check if the cache directory is empty, and proceed with extraction.
     If the cache directory is not empty, the user is given the option to reuse it.
     The cache location is returned after extraction."""
-    file_name = os.path.basename(file_path).split('.')[0]
 
-    # Define a cache directory
-    cache_dir = f"{cache_location}/{file_name}"
+    frame_paths = file_cache.get_cached_frames()
 
-    # Check if the cache directory already exists
-    out_dir_exists = os.path.isdir(cache_dir)
+    if len(frame_paths) > 0:  # if frames cached
 
-    # Create a cache directory if it's missing
-    if not out_dir_exists:
-        os.makedirs(cache_dir, exist_ok=True)
+        file_name = os.path.basename(file_path)
+        uin = input(f"The cache for \"{file_name}\" is not empty." +
+                    "\nWould you like to reuse it [y/n]?" +
+                    "\n>>> ")
 
-    # If the cache directory exists, check if it's empty
-    else:
-        is_out_dir_empty = not os.listdir(cache_dir)
+        if uin == "y":
+            return frame_paths
 
-        # If the cache directory is not empty, ask if the user wants to reuse it
-        if not is_out_dir_empty:
-            uin = input(f"The cache for \"{file_name}\" is not empty." +
-                        "\nWould you like to reuse it [y/n]?" +
-                        "\n>>> ")
-            # If not, empty the directory and extract new frames
-            if uin == "n":
-                shutil.rmtree(cache_dir)
-                os.mkdir(cache_dir)
-            else:
-                return cache_dir
+    # If caches frames are not being used, re-create the entire
+    # file cache and store extracted frames directly in it
+    file_cache.create_new()
+    ffmpeg_extract_frames(file_path, f"{file_cache.get_cache_directory()}/frames")
+    frame_paths = file_cache.get_cached_frames()
 
-    ffmpeg_extract_frames(file_path, cache_dir)
-    return cache_dir
+    if len(frame_paths) == 0:
+        print("Frame extraction failed!")
+        return []
+
+    return frame_paths
 
 
 def main():
-    cwd = os.getcwd()
+    cwd: str = os.getcwd()
     cache = ".cache"
     cache_location = f"{cwd}/{cache}"
 
     # Ask for an input file
-    file_path = filedialog.askopenfilename()
-    frames_dir = extract_frames(file_path, cache_location)
-    frame_paths = fetch_file_paths(frames_dir)
-    calc_parallel_movement_scores(frame_paths, workers=12, chunks=12)
+    file_path: str = filedialog.askopenfilename()
+
+    # Create file's cache
+    file_cache = Cache(file_path, cache_location)
+
+    frame_paths = extract_frames(file_path, file_cache)
+    movement_scores = retrieve_movement_scores(frame_paths, file_cache)
 
 
 if __name__ == '__main__':
