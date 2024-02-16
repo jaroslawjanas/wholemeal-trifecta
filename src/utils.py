@@ -1,17 +1,21 @@
 from PIL import Image
 import numpy as np
 from numpy.typing import NDArray
-from numpy import int16
+from numpy import uint8
 import pickle
 import glob
 from typing import List
 import os
 
 
-def open_img(image_path: str) -> NDArray[int16]:
+def open_img(image_path: str) -> Image:
+    return Image.open(image_path)
+
+
+def np_open_img(image_path: str) -> NDArray[uint8]:
     """Open an image file from the specified path and convert it to a NumPy array."""
-    image = Image.open(image_path)
-    return np.asarray(image, dtype="int16")
+    image = open_img(image_path)
+    return np.asarray(image, dtype="uint8")
 
 
 def fetch_file_paths(directory: str, file_extension="png") -> List[str]:
