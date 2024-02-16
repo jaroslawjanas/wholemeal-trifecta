@@ -4,6 +4,7 @@ import ffmpeg
 import time
 import os
 from mscore import retrieve_movement_scores
+from escore import retrieve_edge_scores
 from typing import List
 from cache import Cache
 
@@ -68,6 +69,7 @@ def main():
 
     frame_paths = extract_frames(file_path, file_cache)
     movement_scores = retrieve_movement_scores(frame_paths, file_cache)
+    edge_scores = retrieve_edge_scores(frame_paths, file_cache)
 
 
 if __name__ == '__main__':
