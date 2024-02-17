@@ -70,7 +70,7 @@ def retrieve_movement_scores(frame_paths: [List[str]], file_cache: Cache) -> Lis
                     "\n>>> ")
 
         if uin == "y":
-            return frame_paths
+            return movement_scores  # type: ignore[return-value]
         else:
             file_cache.delete_object("movement_scores")
 

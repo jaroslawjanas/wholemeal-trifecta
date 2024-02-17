@@ -86,7 +86,7 @@ def retrieve_edge_scores(frame_paths: [List[str]], file_cache: Cache) -> List[Tu
                     "\n>>> ")
 
         if uin == "y":
-            return frame_paths
+            return edge_scores  # type: ignore[return-value]
         else:
             file_cache.delete_object("edge_scores")
 
